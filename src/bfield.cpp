@@ -121,7 +121,7 @@ double Bfield::closest_distance() {
 
 	const double *xs = min.X();
 
-	return sqrt(distance_from_HCS(xs));
+	return std::sqrt(distance_from_HCS(xs));
 }
 
 void Bfield::GetKTensors(std::vector<double>& K, std::vector<double>& Kderiv) {
