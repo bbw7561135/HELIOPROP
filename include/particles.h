@@ -4,11 +4,12 @@
 #include <cmath>
 #include <vector>
 
-#include "TNtupleD.h"
-#include "TRandom3.h"
+//#include "TNtupleD.h"
+//#include "TRandom3.h"
 
 #include "constants.h"
-#include "Bfield.h"
+#include "bfield.h"
+#include "random.h"
 
 class TPseudoParticle {
 public:
@@ -22,7 +23,7 @@ public:
 	~TPseudoParticle() {
 	}
 
-	void Evolve(const TEnvironment*, TRandom3*);
+	void Evolve(const TEnvironment* env, const TRandomNumberGenerator& rn);
 
 	inline double momentum(const double& qf) {
 		return Anumber * sqrt(pow(qf + M, 2) - pow(M, 2));
@@ -43,10 +44,10 @@ public:
 		return (rf < SunRadius || qf < MinEn) ? 0 : 1; ///momentum(qf)*pow(pow(M,2)+pow(momentum(qf),2),-1.8);//12.14*beta_velocity(qf)*pow(qf+0.5*M,-2.6); // Boundary condition. Put only 0 or 1 to allow reweighting // 12.14*beta_velocity(qf)*pow(qf+0.5*M,-2.6);
 	}
 
-	inline void Print(TNtupleD* nt, const double& pid, const double& q0) {
-		nt->Fill(pid, q0, rf, thetaf, phif, qf, af, alphaf, tf, iE);
-		return;
-	}
+	//inline void Print(TNtupleD* nt, const double& pid, const double& q0) {
+	//	nt->Fill(pid, q0, rf, thetaf, phif, qf, af, alphaf, tf, iE);
+	//	return;
+	//}
 
 protected:
 	double Anumber;

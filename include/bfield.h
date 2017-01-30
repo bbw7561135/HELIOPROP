@@ -3,64 +3,57 @@
 
 #include <vector>
 
-#include "TMath.h"
-#include "Math/Minimizer.h"
-#include "Math/GSLMinimizer.h"
-#include "Math/Functor.h"
-#include "Minuit2/Minuit2Minimizer.h"
+//#include "TMath.h"
+//#include "Math/Minimizer.h"
+//#include "Math/GSLMinimizer.h"
+//#include "Math/Functor.h"
+//#include "Minuit2/Minuit2Minimizer.h"
 #include "constants.h"
-
-class TEnvironment {
-
-public:
-	TEnvironment() {
-	}
-	TEnvironment(double Tend_, double Rmax_, double dt_) :
-		Tend(Tend_), Rmax(Rmax_), dt(dt_) {
-	}
-	~TEnvironment() {
-	}
-
-	inline double GetTend() const {
-		return Tend;
-	}
-	inline double GetRmax() const {
-		return Rmax;
-	}
-	inline double Getdt() const {
-		return dt;
-	}
-
-protected:
-	double Tend;
-	double dt;
-	double Rmax;
-};
+#include "TEnvironment.h"
 
 class Bfield {
 
 public:
-	Bfield() {
-	}
-	Bfield(const double r0_, const double B0_, const double Ac_,
-			const double Omega_, const double Vsw_, const double alpha_,
-			const double phi0_, const double lambda0_, const double kpfact_,
-			const double deltaKpar_, const double b_, const double c_) :
-				r0(r0_), Be(B0_), Ac(Ac_), Omega(Omega_), Vswmin(Vsw_), Vsw(Vsw_), Vswmax(
-						760.0 * kms2UAd), OmegaVsw(Omega / Vsw), alpha(alpha_), sinalpha(
-								sin(alpha)), phi0(phi0_), lambda0(lambda0_), Kperp_factor0(
-										kpfact_), Kperp_factor(kpfact_), deltaKpar(deltaKpar_), b(
-												b_), c(c_) {
+	Bfield(double r0_,
+			double B0_,
+			double Ac_,
+			double Omega_,
+			double Vsw_,
+			double alpha_,
+			double phi0_,
+			double lambda0_,
+			double kpfact_,
+			double deltaKpar_,
+			double b_,
+			double c_) :
+				r0(r0_),
+				Be(B0_),
+				Ac(Ac_),
+				Omega(Omega_),
+				Vswmin(Vsw_),
+				Vsw(Vsw_),
+				alpha(alpha_),
+				phi0(phi0_),
+				lambda0(lambda0_),
+				Kperp_factor0(kpfact_),
+				Kperp_factor(kpfact_),
+				deltaKpar(deltaKpar_),
+				b(b_),
+				c(c_) {
+		sinalpha = sin(alpha);
+		Vswmax = 760.0 * kms2UAd;
+		OmegaVsw = Omega / Vsw;
 		B0 = Be / sqrt(1.0 + pow(OmegaVsw * r0, 2));
 		r = 0;
 		theta = 0;
 		phi = 0;
 		gamma = OmegaVsw * r * sin(theta);
-		gamma2 = pow(gamma, 2);
+		gamma_squared = pow(gamma, 2);
 		psi = GetPsi();
 		qf = 0;
 		charge = 0;
 		mom = 0;
+		betavelocity = 0;
 	}
 
 	~Bfield() {
@@ -69,39 +62,40 @@ public:
 	inline double dGammadtheta() const {
 		return gamma / tan(theta);
 	} // gamma*cos(theta)*(3.0-pow(cos(theta),2))/(1.0+pow(cos(theta),2));
+
 	inline double GetPsi() const {
 		return atan(gamma);
 	}
+
 	inline double dPsidr() const {
-		return 1.0 / (1.0 + gamma2) * gamma / r;
+		return 1.0 / (1.0 + gamma_squared) * gamma / r;
 	}
 	inline double dPsidtheta() const {
-		return 1.0 / (1.0 + gamma2) * dGammadtheta();
+		return 1.0 / (1.0 + gamma_squared) * dGammadtheta();
 	}
 
 	inline double GetVsw() const {
 		return Vsw;
 	}
 	// B components
-	inline double Br() {
+	inline double B_r() {
 		return Ac * B0 * pow(r0 / r, 2) * Heaviside(theta - thetaprime());
 	}
-	inline double Bphi() {
-		return -Br() * gamma;
+	inline double B_phi() {
+		return -B_r() * gamma;
 	}
-	// B tot
-	inline double Btot() {
+	inline double B_total() {
 		return fabs(Heaviside(theta - thetaprime())) * B0 * pow(r0 / r, 2)
-		* sqrt(1.0 + gamma2); //sqrt(pow(Br(r,theta,phi),2) + pow(Bphi(r,theta,phi),2));
+		* sqrt(1.0 + gamma_squared); //sqrt(pow(Br(r,theta,phi),2) + pow(Bphi(r,theta,phi),2));
 	}
-	inline double dBtotdr() {
-		return -Btot() / r * (2.0 + gamma2) / (1.0 + gamma2);
+	inline double dBtotal_dr() {
+		return -B_total() / r * (2.0 + gamma_squared) / (1.0 + gamma_squared);
 	}
-	inline double dBtotdphi() {
+	inline double dBtotal_dphi() {
 		return 0;
 	}
-	inline double dBtotdtheta() {
-		return -Btot() * gamma / (1.0 + gamma2) * dGammadtheta();
+	inline double dBtotal_dtheta() {
+		return -B_total() * gamma / (1.0 + gamma_squared) * dGammadtheta();
 	}
 
 	// Drift velocity
@@ -111,14 +105,13 @@ public:
 	double closest_distance();
 
 	inline double rL() {
-		return (3.3 / 149597870691.0) * mom / Btot() / fabs(charge);
+		return (3.3 / 149597870691.0) * mom / B_total() / fabs(charge);
 	}
 	inline double thetaprime() {
-		return TMath::PiOver2() + TMath::ASin(sinalpha * sin(phi - phi0 + OmegaVsw * r));
+		return PiOver2() + ASin(sinalpha * sin(phi - phi0 + OmegaVsw * r));
 	}
 	inline double thetaprime(const double& r_, const double& phi_) {
-		return TMath::PiOver2()
-		+ TMath::ASin(sinalpha * sin(phi_ - phi0 + OmegaVsw * r_));
+		return PiOver2() + ASin(sinalpha * sin(phi_ - phi0 + OmegaVsw * r_));
 	}
 	inline double thetaprime_phi() {
 		return sinalpha * cos(phi - phi0 + OmegaVsw * r)
@@ -129,30 +122,20 @@ public:
 	}  // to be revised
 	inline double thetaprime_phi(const double& r_, const double& phi_) {
 		return sinalpha * cos(phi_ - phi0 + OmegaVsw * r_)
-		/ sqrt(
-				1.0
-				- pow(
-						sinalpha
-						* sin(
-								phi_ - phi0
-								+ OmegaVsw
-								* r_),
-								2));
+		/ sqrt(1.0 - pow(sinalpha * sin(phi_ - phi0 + OmegaVsw * r_), 2));
 	}  // to be revised
 	inline double thetaprime_r(const double& r_, const double& phi_) {
 		return OmegaVsw * thetaprime_phi(r_, phi_);
 	}  // to be revised
 	inline double beta() {
-		if (alpha == 0)
+		if (alpha == 0) {
 			return 0.0;
-		double b = atan(
-				OmegaVsw * r / sin(psi)
+		}
+		double b = atan(OmegaVsw * r / sin(psi)
 				* sqrt(pow(sinalpha, 2) - pow(cos(thetaprime()), 2))
 				/ sin(thetaprime()));
-
 		return fabs(b) * sgn(cos(phi - phi0 + OmegaVsw * r));
 	}
-
 	inline void SetPhi0(const double& phi0_) {
 		phi0 = phi0_;
 	}
@@ -162,7 +145,7 @@ public:
 	inline double Kpar() {
 
 		//double lambda_par = lambda0*mom/(Btot()/B0);//(1.0+r/r0);
-		double lambda_par = lambda0 / (Btot() / B0);  //(1.0+r/r0);
+		double lambda_par = lambda0 / (B_total() / B0);  //(1.0+r/r0);
 		//double lambda_par = lambda0;//*(1.0+r/r0);
 
 		//if (mom >= 0.1*fabs(charge))
@@ -185,18 +168,18 @@ public:
 		//return 0;
 		//return (mom >= 1) ? lambda0*mom/r0 : lambda0/r0;
 		//return lambda0*mom/r0;
-		return -Kpar() / Btot() * dBtotdr();
+		return -Kpar() / B_total() * dBtotal_dr();
 	}
 
 	inline double dKpardphi() {
 		//return 0;
-		return -Kpar() / Btot() * dBtotdphi();
+		return -Kpar() / B_total() * dBtotal_dphi();
 
 	}
 
 	inline double dKpardtheta() {
 		//return 0;
-		return -Kpar() / Btot() * dBtotdtheta();
+		return -Kpar() / B_total() * dBtotal_dtheta();
 	}
 
 	inline double dKrrdr() {
@@ -228,13 +211,12 @@ public:
 		r = r_;
 		theta = theta_;
 		phi = phi_;
-		//if (theta*TMath::RadToDeg() <= 30 || theta*TMath::RadToDeg() >= 150) { Vsw = Vswmax; } else { Vsw = Vswmin*(1.0+fabs(cos(theta))); } // Implements eq. 17 of Bobik et al. ApJ 745:132 (2012)
 		Vsw = Vswmin; //*(1.0+pow(cos(theta),2)); // Implements Fichtner et al. A&A 308:248 (1996), which is better than Bobik et al. 2012 because it is differentiable
 		OmegaVsw = Omega / Vsw;
 		gamma = OmegaVsw * r * sin(theta);
-		gamma2 = pow(gamma, 2);
+		gamma_squared = pow(gamma, 2);
 		psi = GetPsi();
-		if (theta < 30 * TMath::DegToRad() || theta > 150.0 * TMath::DegToRad())
+		if (theta < 30 * DegToRad() || theta > 150.0 * DegToRad())
 			Kperp_factor = 10.0 * Kperp_factor0;
 		else
 			Kperp_factor = Kperp_factor0;
@@ -267,7 +249,7 @@ protected:
 	double sinalpha;
 	double deltaKpar;
 	double gamma;
-	double gamma2;
+	double gamma_squared;
 	double qf;
 	double betavelocity;
 	double charge;
