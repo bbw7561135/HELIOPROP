@@ -25,37 +25,37 @@ int main(int argc, char** argv) {
 	//TStopwatch ts;
 	//ts.Start();
 
-	Input* inp = new Input();
-	inp->LoadFile(argv[1]);
-	inp->Print();
+	Input* input = new Input(argv[1]);
+	//input->load_file(argv[1]);
+	//input->print();
 
 	//TFile* outfile = new TFile(inp->outputfilename.c_str(), "RECREATE");
-
 	//TNtupleD* nt = new TNtupleD("nt", "Positions", "pid:q0:rf:thetaf:phif:qf:af:alphaf:tf:iE");
 	//TNtupleD* header = new TNtupleD("header", "Init data", "dt:Nparticles:NE:logEmin:logEmax");
 	//TRandom3* rn = new TRandom3(inp->seed);
-	TRandomNumberGenerator rn(inp->seed);
 
-	std::cout << inp->seed << "\n";
+	TRandomNumberGenerator rn(input->seed);
+
+	std::cout << input->seed << "\n";
 
 	// r0, Be, Ac, Omega, Vsw, alpha, phi0, lambda0
 	double bp[12] = { 1,  // Earth position [UA]
-			inp->MagField,  ///sqrt(2.0), // Reference magnetic field [T]
-			inp->polarity, // Magnetic field polarity
+			input->MagField,  ///sqrt(2.0), // Reference magnetic field [T]
+			input->polarity, // Magnetic field polarity
 			TwoPi() / 27.0, // Solar differential rotation rate [d^-1]
 			400.0 * kms2UAd, // Velocity of solar wind (constant, radial) [ km/s --> UA/d ]
-			inp->tiltangle * DegToRad(), // Tilt angle of current sheet [deg --> rad]
+			input->tiltangle * DegToRad(), // Tilt angle of current sheet [deg --> rad]
 			0, // Reference phi position of current sheet (basically not used, but useful to make the current sheet corotate with Sun)
-			inp->lambda_par, // parallel mean-free-path [ UA ]
-			inp->Kperp_factor, inp->delta, inp->b, inp->c };
+			input->lambda_par, // parallel mean-free-path [ UA ]
+			input->Kperp_factor, input->delta, input->b, input->c };
 
 	const double tl = 0;
 	TEnvironment* env = new TEnvironment(tl,
-			inp->Rmax /* Rmax = Radius of the HelioPause [ UA ] */,
-			inp->dt /* Integration backward time step [ d ] */);
+			input->Rmax /* Rmax = Radius of the HelioPause [ UA ] */,
+			input->dt /* Integration backward time step [ d ] */);
 
-	const int Nparticles = inp->Nparticles;
-	const double charge = double(inp->Znumber);
+	const int Nparticles = input->particle_number;
+	const double charge = double(input->Znumber);
 
 	double logEmin;
 	double logEmax;
@@ -63,16 +63,16 @@ int main(int argc, char** argv) {
 
 	std::vector<double> enPam;
 
-	if (inp->Pamelamode == false) {
-		if (inp->SingleEnergy) {
+	if (input->Pamelamode == false) {
+		if (input->SingleEnergy) {
 			NE = 1;
-			logEmin = log10(inp->Emin);
-			logEmax = log10(inp->Emin);
-			enPam.push_back(inp->Emin);
+			logEmin = log10(input->kenergy_min);
+			logEmax = log10(input->kenergy_min);
+			enPam.push_back(input->kenergy_min);
 		} else {
-			logEmin = log10(inp->Emin);
-			logEmax = log10(inp->Emax);
-			NE = inp->NE;
+			logEmin = log10(input->kenergy_min);
+			logEmax = log10(input->kenergy_max);
+			NE = input->kenergy_size;
 			for (int iE = 0; iE < NE; iE++)
 				enPam.push_back(
 						pow(10,
@@ -119,7 +119,7 @@ int main(int argc, char** argv) {
 				double af = 0; // Final amplitude
 				double alphaf = 1; // Final weight
 
-				TPseudoParticle ps(inp->hd, double(inp->Anumber), rf, phif,
+				TPseudoParticle ps(input->particle_type, double(input->Anumber), rf, phif,
 						thetaf, q0, tl, af, alphaf, charge, bp);
 				ps.Evolve(env, rn);
 #ifdef _OPENMP
@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
 	//nt->Write();
 	//outfile->Close();
 	delete env;
-	delete inp;
+	delete input;
 
 	//ts.Stop();
 

@@ -16,7 +16,7 @@ double Input::QueryDoubleAttribute(std::string obj, TiXmlElement* el) const {
 	return result;
 }
 
-int Input::LoadFile(const std::string inputfilename) {
+int Input::load_file(const std::string inputfilename) {
 
 	TiXmlDocument* doc = new TiXmlDocument(inputfilename.c_str());
 
@@ -27,10 +27,10 @@ int Input::LoadFile(const std::string inputfilename) {
 			int found = inputfilename.rfind('/');
 			if (found == std::string::npos)
 				found = -1;
-			outputfilename = "output/";
-			outputfilename += std::string(inputfilename, found + 1,
+			output_filename = "output/";
+			output_filename += std::string(inputfilename, found + 1,
 					inputfilename.size() - 4 - (found + 1));
-			outputfilename += ".root";
+			output_filename += ".root";
 
 			Pamelamode = false;
 			TiXmlElement* el1 = el->FirstChildElement("Pamela");
@@ -47,11 +47,11 @@ int Input::LoadFile(const std::string inputfilename) {
 			Rmax = QueryDoubleAttribute("Rmax", el);
 			dt = QueryDoubleAttribute("Deltat", el);
 
-			Emin = QueryDoubleAttribute("Emin", el);
-			Emax = QueryDoubleAttribute("Emax", el);
-			NE = QueryIntAttribute("NE", el);
+			kenergy_min = QueryDoubleAttribute("Emin", el);
+			kenergy_max = QueryDoubleAttribute("Emax", el);
+			kenergy_size = QueryIntAttribute("NE", el);
 
-			Nparticles = QueryIntAttribute("Nparticles", el);
+			particle_number = QueryIntAttribute("Nparticles", el);
 			Znumber = QueryIntAttribute("Charge", el);
 
 			el1 = el->FirstChildElement("Mass");
@@ -60,9 +60,9 @@ int Input::LoadFile(const std::string inputfilename) {
 				std::string gmod = "Nucleus";
 				//el1->QueryStringAttribute("type", &gmod);
 				if (gmod == "Nucleus")
-					hd = NUCLEUS;
+					particle_type = NUCLEUS;
 				else if (gmod == "Lepton")
-					hd = LEPTON;
+					particle_type = LEPTON;
 			}
 
 			lambda_par = QueryDoubleAttribute("LambdaPar", el);
@@ -99,20 +99,20 @@ int Input::LoadFile(const std::string inputfilename) {
 	return 0;
 }
 
-void Input::Print() {
+void Input::print() {
 
 	std::cout << "Settings are " << "\n";
-	std::cout << "Output file " << outputfilename << "\n";
-	std::cout << "NE = " << NE << "\n";
-	std::cout << "Emax = " << Emax << "\n";
-	std::cout << "Emin = " << Emin << "\n";
+	std::cout << "Output file " << output_filename << "\n";
+	std::cout << "NE = " << kenergy_size << "\n";
+	std::cout << "Emax = " << kenergy_max << "\n";
+	std::cout << "Emin = " << kenergy_min << "\n";
 	std::cout << "Rmax = " << Rmax << "\n";
 	std::cout << "Delta t = " << dt << "\n";
-	std::cout << "How many particles? " << Nparticles << "\n";
+	std::cout << "How many particles? " << particle_number << "\n";
 	std::cout << "Particle type = ";
-	if (hd == NUCLEUS)
+	if (particle_type == NUCLEUS)
 		std::cout << "nucleus" << "\n";
-	else if (hd == LEPTON)
+	else if (particle_type == LEPTON)
 		std::cout << "lepton" << "\n";
 	std::cout << "Charge = " << Znumber << "\n";
 	std::cout << "Mass = " << Anumber << "\n";

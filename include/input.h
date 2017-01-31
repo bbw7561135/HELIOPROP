@@ -16,15 +16,17 @@ private:
 	double QueryDoubleAttribute(std::string, TiXmlElement*) const;
 
 public:
-	Input() {
+	Input(const std::string filename) {
+		load_file(filename);
+		print();
 	}
 	~Input() {
 	}
 
-	int LoadFile(const std::string);
-	void Print();
+	int load_file(const std::string);
+	void print();
 
-	std::string outputfilename;
+	std::string output_filename;
 
 	int Anumber;
 	int Znumber;
@@ -38,11 +40,12 @@ public:
 	double polarity;
 	double tiltangle;
 
-	double Emin;
-	double Emax;
-	int NE;
-	int Nparticles;
-	PARTICLETYPE hd;
+	double kenergy_min;
+	double kenergy_max;
+	size_t kenergy_size;
+
+	size_t particle_number;
+	PARTICLETYPE particle_type;
 
 	double Rmax;
 	double dt;
