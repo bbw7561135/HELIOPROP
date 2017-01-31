@@ -13,8 +13,6 @@
 
 class TPseudoParticle {
 public:
-	TPseudoParticle() {
-	}
 	TPseudoParticle(const PARTICLETYPE& hd, const double& A_, const double& rf_,
 			const double& phif_, const double& thetaf_, const double& qf_,
 			const double& tf_, const double& af_, const double& alphaf_,
@@ -65,7 +63,7 @@ protected:
 	std::vector<double> vd;
 	std::vector<double> Ktensor;
 	std::vector<double> Kderiv;
-	Bfield bf;
+	TBfield bf;
 };
 
 #endif

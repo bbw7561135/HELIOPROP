@@ -13,6 +13,8 @@ include_directories( "${CMAKE_SOURCE_DIR}/include" )
 
 set( HELIOPROP_SRCS 
      src/bfield.cpp
+     src/bcomponents.cpp
+     src/diffusiontensor.cpp
      src/helioprop.cpp
      src/input.cpp
      src/particles.cpp

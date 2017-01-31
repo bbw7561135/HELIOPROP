@@ -11,11 +11,24 @@
 #include "constants.h"
 #include "TEnvironment.h"
 
-class Bfield {
+class TBfield {
 
 public:
-	Bfield(double r0_,
-			double B0_,
+	TBfield() {
+		r0 = 0;
+		Be = 0;
+		Ac = 0;
+		Omega = 0;
+		Vsw = 0;
+		alpha = 0;
+		phi_0 = 0;
+		lambda_0 = 0;
+		Kperp_factor_constant = 0;
+		set(0);
+	}
+
+	TBfield(double r0_,
+			double Be_,
 			double Ac_,
 			double Omega_,
 			double Vsw_,
@@ -27,233 +40,156 @@ public:
 			double b_,
 			double c_) :
 				r0(r0_),
-				Be(B0_),
+				Be(Be_),
 				Ac(Ac_),
 				Omega(Omega_),
-				Vswmin(Vsw_),
 				Vsw(Vsw_),
 				alpha(alpha_),
-				phi0(phi0_),
-				lambda0(lambda0_),
-				Kperp_factor0(kpfact_),
-				Kperp_factor(kpfact_),
-				deltaKpar(deltaKpar_),
+				phi_0(phi0_),
+				lambda_0(lambda0_),
+				Kperp_factor_constant(kpfact_),
+				delta_Kpar(deltaKpar_),
 				b(b_),
 				c(c_) {
-		sinalpha = sin(alpha);
-		Vswmax = 760.0 * kms2UAd;
-		OmegaVsw = Omega / Vsw;
-		B0 = Be / sqrt(1.0 + pow(OmegaVsw * r0, 2));
-		r = 0;
-		theta = 0;
-		phi = 0;
-		gamma = OmegaVsw * r * sin(theta);
+		sin_alpha = sin(alpha);
+		Vsw_max = 760.0 * kms2UAd;
+		Vsw_min = Vsw;
+		B0 = Be / sqrt(1.0 + pow(Omega_Vsw * r0, 2));
+
+		set(0);
+	}
+
+	~TBfield() {
+	}
+
+	void set(double value) {
+		set(value, value, value, value, value, value, value);
+	}
+
+	void set(double r_, double theta_, double phi_, double qf_, double beta_, double momentum_, double charge_) {
+		r = r_;
+		theta = theta_;
+		phi = phi_;
+		qf = qf_;
+		betavelocity = beta_;
+		charge = charge_;
+		momentum = momentum_;
+		Vsw = Vsw_min; // *(1.0+pow(cos(theta),2)); //Implements Fichtner et al. A&A 308:248 (1996), which is better than Bobik et al. 2012 because it is differentiable
+		Omega_Vsw = Omega / Vsw;
+		gamma = Omega_Vsw * r * sin(theta);
 		gamma_squared = pow(gamma, 2);
-		psi = GetPsi();
-		qf = 0;
-		charge = 0;
-		mom = 0;
-		betavelocity = 0;
+		psi = atan(gamma);
+		if (theta < 30.0 * DegToRad() || theta > 150.0 * DegToRad())
+			Kperp_factor = 10.0 * Kperp_factor_constant;
+		else
+			Kperp_factor = Kperp_factor_constant;
 	}
 
-	~Bfield() {
-	}
-
-	inline double dGammadtheta() const {
+	inline double dGamma_dtheta() const {
 		return gamma / tan(theta);
 	} // gamma*cos(theta)*(3.0-pow(cos(theta),2))/(1.0+pow(cos(theta),2));
 
-	inline double GetPsi() const {
-		return atan(gamma);
-	}
-
-	inline double dPsidr() const {
+	inline double dPsi_dr() const {
 		return 1.0 / (1.0 + gamma_squared) * gamma / r;
 	}
-	inline double dPsidtheta() const {
-		return 1.0 / (1.0 + gamma_squared) * dGammadtheta();
+	inline double dPsi_dtheta() const {
+		return 1.0 / (1.0 + gamma_squared) * dGamma_dtheta();
 	}
 
 	inline double GetVsw() const {
 		return Vsw;
 	}
+
 	// B components
-	inline double B_r() {
-		return Ac * B0 * pow(r0 / r, 2) * Heaviside(theta - thetaprime());
-	}
-	inline double B_phi() {
-		return -B_r() * gamma;
-	}
-	inline double B_total() {
-		return fabs(Heaviside(theta - thetaprime())) * B0 * pow(r0 / r, 2)
-		* sqrt(1.0 + gamma_squared); //sqrt(pow(Br(r,theta,phi),2) + pow(Bphi(r,theta,phi),2));
-	}
-	inline double dBtotal_dr() {
-		return -B_total() / r * (2.0 + gamma_squared) / (1.0 + gamma_squared);
-	}
-	inline double dBtotal_dphi() {
-		return 0;
-	}
-	inline double dBtotal_dtheta() {
-		return -B_total() * gamma / (1.0 + gamma_squared) * dGammadtheta();
-	}
+	double B_r() const;
+	double B_phi() const;
+	double B_total() const;
+	double dBtotal_dr() const;
+	double dBtotal_dphi() const;
+	double dBtotal_dtheta() const;
 
 	// Drift velocity
-	void GetVd(std::vector<double>& vd);
+	void getDriftVelocity(std::vector<double>& vd);
+
 	double distance_from_HCS(const double* xx);
 	double deriv_distance_from_HCS(const double* xx, unsigned int up);
 	double closest_distance();
 
 	inline double rL() {
-		return (3.3 / 149597870691.0) * mom / B_total() / fabs(charge);
+		return (3.3 / 149597870691.0) * momentum / B_total() / fabs(charge);
 	}
-	inline double thetaprime() {
-		return PiOver2() + ASin(sinalpha * sin(phi - phi0 + OmegaVsw * r));
+	inline double thetaprime() const {
+		return PiOver2() + ASin(sin_alpha * sin(phi - phi_0 + Omega_Vsw * r));
 	}
 	inline double thetaprime(const double& r_, const double& phi_) {
-		return PiOver2() + ASin(sinalpha * sin(phi_ - phi0 + OmegaVsw * r_));
+		return PiOver2() + ASin(sin_alpha * sin(phi_ - phi_0 + Omega_Vsw * r_));
 	}
 	inline double thetaprime_phi() {
-		return sinalpha * cos(phi - phi0 + OmegaVsw * r)
-		/ sqrt(1.0 - pow(sinalpha * sin(phi - phi0 + OmegaVsw * r), 2));
+		return sin_alpha * cos(phi - phi_0 + Omega_Vsw * r)
+		/ sqrt(1.0 - pow(sin_alpha * sin(phi - phi_0 + Omega_Vsw * r), 2));
 	}  // to be revised
 	inline double thetaprime_r() {
-		return OmegaVsw * thetaprime_phi();
+		return Omega_Vsw * thetaprime_phi();
 	}  // to be revised
 	inline double thetaprime_phi(const double& r_, const double& phi_) {
-		return sinalpha * cos(phi_ - phi0 + OmegaVsw * r_)
-		/ sqrt(1.0 - pow(sinalpha * sin(phi_ - phi0 + OmegaVsw * r_), 2));
+		return sin_alpha * cos(phi_ - phi_0 + Omega_Vsw * r_)
+		/ sqrt(1.0 - pow(sin_alpha * sin(phi_ - phi_0 + Omega_Vsw * r_), 2));
 	}  // to be revised
 	inline double thetaprime_r(const double& r_, const double& phi_) {
-		return OmegaVsw * thetaprime_phi(r_, phi_);
+		return Omega_Vsw * thetaprime_phi(r_, phi_);
 	}  // to be revised
 	inline double beta() {
 		if (alpha == 0) {
 			return 0.0;
 		}
-		double b = atan(OmegaVsw * r / sin(psi)
-				* sqrt(pow(sinalpha, 2) - pow(cos(thetaprime()), 2))
+		double b = atan(Omega_Vsw * r / sin(psi)
+				* sqrt(pow(sin_alpha, 2) - pow(cos(thetaprime()), 2))
 				/ sin(thetaprime()));
-		return fabs(b) * sgn(cos(phi - phi0 + OmegaVsw * r));
+		return fabs(b) * sgn(cos(phi - phi_0 + Omega_Vsw * r));
 	}
 	inline void SetPhi0(const double& phi0_) {
-		phi0 = phi0_;
+		phi_0 = phi0_;
 	}
 
-	void GetKTensors(std::vector<double>& K, std::vector<double>& Kderiv);
-
-	inline double Kpar() {
-
-		//double lambda_par = lambda0*mom/(Btot()/B0);//(1.0+r/r0);
-		double lambda_par = lambda0 / (B_total() / B0);  //(1.0+r/r0);
-		//double lambda_par = lambda0;//*(1.0+r/r0);
-
-		//if (mom >= 0.1*fabs(charge))
-		double rig = mom / fabs(charge);
-
-		//if (rig > 1.)
-		lambda_par *= pow(rig, deltaKpar);
-
-		// <!-- as in Potgieter paper: 1302.1284 -->
-		if (b != 0 && c != 0)
-			lambda_par *= pow(
-					(pow(rig, c) + pow(4.0 / fabs(charge), c))
-					/ (1.0 + pow(4.0 / fabs(charge), c)),
-					(b - deltaKpar) / c);
-
-		return lambda_par * betavelocity * Clight / 3.0;
-	}
-
-	inline double dKpardr() {
-		//return 0;
-		//return (mom >= 1) ? lambda0*mom/r0 : lambda0/r0;
-		//return lambda0*mom/r0;
-		return -Kpar() / B_total() * dBtotal_dr();
-	}
-
-	inline double dKpardphi() {
-		//return 0;
-		return -Kpar() / B_total() * dBtotal_dphi();
-
-	}
-
-	inline double dKpardtheta() {
-		//return 0;
-		return -Kpar() / B_total() * dBtotal_dtheta();
-	}
-
-	inline double dKrrdr() {
-		return dKpardr() * (pow(cos(psi), 2) + Kperp_factor * pow(sin(psi), 2))
-				+ Kpar() * (-1.0 + Kperp_factor) * sin(2.0 * psi) * dPsidr();
-	}
-
-	inline double dKrphidphi() {
-		return -0.5 * sin(2.0 * psi) * (1.0 - Kperp_factor) * dKpardphi();
-	}
-
-	inline double dKrphidr() {
-		return -0.5 * sin(2.0 * psi) * (1.0 - Kperp_factor) * dKpardr()
-				- cos(2.0 * psi) * dPsidr() * (1.0 - Kperp_factor) * Kpar();
-	}
-
-	inline double dKthetathetadtheta() {
-		return Kperp_factor * dKpardtheta();
-	}  // to be revised
-
-	inline double dKphiphidphi() {
-		return dKpardphi()
-				* (pow(sin(psi), 2) + Kperp_factor * pow(cos(psi), 2));
-	}
-
-	inline void Set(const double& r_, const double& theta_, const double& phi_,
-			const double& qf_, double beta_, double mom_,
-			const double& charge_) {
-		r = r_;
-		theta = theta_;
-		phi = phi_;
-		Vsw = Vswmin; //*(1.0+pow(cos(theta),2)); // Implements Fichtner et al. A&A 308:248 (1996), which is better than Bobik et al. 2012 because it is differentiable
-		OmegaVsw = Omega / Vsw;
-		gamma = OmegaVsw * r * sin(theta);
-		gamma_squared = pow(gamma, 2);
-		psi = GetPsi();
-		if (theta < 30 * DegToRad() || theta > 150.0 * DegToRad())
-			Kperp_factor = 10.0 * Kperp_factor0;
-		else
-			Kperp_factor = Kperp_factor0;
-		qf = qf_;
-		betavelocity = beta_;
-		charge = charge_;
-		mom = mom_;
-		return;
-	}
+	// Diffusion Tensor
+	double Kpar() const;
+	double dKpar_dr() const;
+	double dKpar_dphi() const;
+	double dKpar_dtheta() const;
+	double dKrr_dr() const;
+	double dKrphi_dphi() const;
+	double dKrphi_dr() const;
+	double dKthetatheta_dtheta() const;
+	double dKphiphi_dphi() const;
+	void getKTensors(std::vector<double>& K, std::vector<double>& Kderiv);
 
 protected:
 	double r0;
 	double alpha;
-	double phi0;
-	double lambda0;
+	double phi_0;
+	double lambda_0;
 	double Kperp_factor;
-	double Kperp_factor0;
+	double Kperp_factor_constant;
 	double Be;
 	double B0;
 	double Ac;
 	double Omega;
 	double Vsw;
-	double Vswmin;
-	double Vswmax;
+	double Vsw_min;
+	double Vsw_max;
 	double r;
 	double theta;
 	double phi;
 	double psi;
-	double OmegaVsw;
-	double sinalpha;
-	double deltaKpar;
+	double Omega_Vsw;
+	double sin_alpha;
+	double delta_Kpar;
 	double gamma;
 	double gamma_squared;
 	double qf;
 	double betavelocity;
 	double charge;
-	double mom;
+	double momentum;
 	double b;
 	double c;
 };

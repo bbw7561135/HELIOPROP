@@ -1,7 +1,6 @@
 #include "bfield.h"
 
-// Drift velocity
-void Bfield::GetVd(std::vector<double>& vd) {
+void TBfield::getDriftVelocity(std::vector<double>& vd) {
 
 	double signfactors = sgn(charge) * Ac;
 
@@ -9,11 +8,11 @@ void Bfield::GetVd(std::vector<double>& vd) {
 
 	double LarmorRadius = rL();
 	double commonfactor = (2.0 / 3.0) * velocity * (LarmorRadius / r)
-			/ pow(1 + gamma2, 3.0 / 2.0) * signfactors
+			/ pow(1 + gamma_squared, 3.0 / 2.0) * signfactors
 			* Heaviside(theta - thetaprime());
 	vd[0] = -gamma / tan(theta) * commonfactor;
 	vd[1] = -gamma * vd[0];
-	vd[2] = gamma * (2.0 + gamma2) * commonfactor;
+	vd[2] = gamma * (2.0 + gamma_squared) * commonfactor;
 
 	double LrL = closest_distance() / LarmorRadius;
 
@@ -27,8 +26,8 @@ void Bfield::GetVd(std::vector<double>& vd) {
 
 	}
 
-	double momfactor = 10.0 * pow(mom / fabs(charge), 2)
-			/ (1.0 + 10.0 * pow(mom / fabs(charge), 2));
+	double momfactor = 10.0 * pow(momentum / fabs(charge), 2)
+			/ (1.0 + 10.0 * pow(momentum / fabs(charge), 2));
 	vd[0] *= momfactor;
 	vd[1] *= momfactor;
 	vd[2] *= momfactor;
@@ -36,25 +35,7 @@ void Bfield::GetVd(std::vector<double>& vd) {
 	return;
 }
 
-void Bfield::GetKTensors(std::vector<double>& K, std::vector<double>& Kderiv) {
-
-	double kappa_par = Kpar();
-	double cpsi = cos(psi);
-	double spsi = sin(psi);
-
-	K[0] = kappa_par * (pow(cpsi, 2) + Kperp_factor * pow(spsi, 2)); // Krr
-	K[1] = -kappa_par * (1.0 - Kperp_factor) * spsi * cpsi;             // Krphi
-	K[2] = Kperp_factor * kappa_par;                              // Kthetatheta
-	K[3] = kappa_par * (Kperp_factor * pow(cpsi, 2) + pow(spsi, 2));  // Kphiphi
-
-	Kderiv[0] = 2.0 * r * K[0] + r * r * dKrrdr(); // d/dr (r^2*Krr)
-	Kderiv[1] = dKrphidphi(); // d/dphi Krphi
-	Kderiv[2] = cos(theta) * K[2] + sin(theta) * dKthetathetadtheta(); // d/dtheta (sin(theta)*Kthetatheta)
-	Kderiv[3] = dKphiphidphi(); // d/dphi Kphiphi
-	Kderiv[4] = K[1] + r * dKrphidr(); // d/dr (r*Krphi)
-}
-
-double Bfield::distance_from_HCS(const double* xx) {
+double TBfield::distance_from_HCS(const double* xx) {
 
 	double thetap = thetaprime(xx[0], xx[1]);
 	double rp = xx[0];
@@ -69,7 +50,7 @@ double Bfield::distance_from_HCS(const double* xx) {
 
 }
 
-double Bfield::deriv_distance_from_HCS(const double* xx, unsigned int up) {
+double TBfield::deriv_distance_from_HCS(const double* xx, unsigned int up) {
 	double thetap = thetaprime(xx[0], xx[1]);
 	double rp = xx[0];
 	double phip = xx[1];
@@ -106,7 +87,7 @@ double Bfield::deriv_distance_from_HCS(const double* xx, unsigned int up) {
 	return -1;
 }
 
-double Bfield::closest_distance() {
+double TBfield::closest_distance() {
 
 	if (alpha == 0) {
 		return fabs(r * cos(theta));
