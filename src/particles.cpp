@@ -41,7 +41,7 @@ void TPseudoParticle::Evolve(const TEnvironment* env, const TRandomNumberGenerat
 		bf.set(rf, thetaf, phif, qf, beta_velocity(qf), momentum(qf), charge);
 		bf.getDriftVelocity(vd);
 		bf.getKTensors(Ktensor, Kderiv);
-		double Vsw = bf.GetVsw();
+		double Vsw = bf.getVsw();
 
 		double dt = dt0*pow(rf,2)/Ktensor[0];
 		double sqrtdt = sqrt(dt);

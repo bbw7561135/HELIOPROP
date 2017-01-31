@@ -26,6 +26,16 @@ void TBfield::getDriftVelocity(std::vector<double>& vd) {
 	vd[2] *= momfactor;
 }
 
+double TBfield::beta() const {
+	if (alpha == 0) {
+		return 0.0;
+	}
+	double b = atan(Omega_Vsw * r / sin(psi)
+			* sqrt(pow(sin_alpha, 2) - pow(cos(thetaprime()), 2))
+			/ sin(thetaprime()));
+	return fabs(b) * sgn(cos(phi - phi_0 + Omega_Vsw * r));
+}
+
 double TBfield::thetaprime() const {
 	return PiOver2() + ASin(sin_alpha * sin(phi - phi_0 + Omega_Vsw * r));
 }

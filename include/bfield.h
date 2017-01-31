@@ -62,30 +62,10 @@ public:
 	~TBfield() {
 	}
 
-	void set(double value) {
-		set(value, value, value, value, value, value, value);
-	}
+	void set(double value);
+	void set(double r_, double theta_, double phi_, double qf_, double beta_, double momentum_, double charge_);
 
-	void set(double r_, double theta_, double phi_, double qf_, double beta_, double momentum_, double charge_) {
-		r = r_;
-		theta = theta_;
-		phi = phi_;
-		qf = qf_;
-		betavelocity = beta_;
-		charge = charge_;
-		momentum = momentum_;
-		Vsw = Vsw_min; // *(1.0+pow(cos(theta),2)); //Implements Fichtner et al. A&A 308:248 (1996), which is better than Bobik et al. 2012 because it is differentiable
-		Omega_Vsw = Omega / Vsw;
-		gamma = Omega_Vsw * r * sin(theta);
-		gamma_squared = pow(gamma, 2);
-		psi = atan(gamma);
-		if (theta < 30.0 * DegToRad() || theta > 150.0 * DegToRad())
-			Kperp_factor = 10.0 * Kperp_factor_constant;
-		else
-			Kperp_factor = Kperp_factor_constant;
-	}
-
-	inline double GetVsw() const {
+	inline double getVsw() const {
 		return Vsw;
 	}
 
@@ -106,27 +86,10 @@ public:
 	double thetaprime_r() const;
 	double thetaprime_phi(const double& r_, const double& phi_) const;
 	double thetaprime_r(const double& r_, const double& phi_) const;
+	double beta() const;
 	double distance_from_HCS(const double* xx);
 	double deriv_distance_from_HCS(const double* xx, unsigned int up);
 	double closest_distance();
-
-	/*inline double rL() {
-		return (3.3 / 149597870691.0) * momentum / B_total() / fabs(charge);
-	}*/
-
-	inline double beta() {
-		if (alpha == 0) {
-			return 0.0;
-		}
-		double b = atan(Omega_Vsw * r / sin(psi)
-				* sqrt(pow(sin_alpha, 2) - pow(cos(thetaprime()), 2))
-				/ sin(thetaprime()));
-		return fabs(b) * sgn(cos(phi - phi_0 + Omega_Vsw * r));
-	}
-
-	inline void SetPhi0(const double& phi0_) {
-		phi_0 = phi0_;
-	}
 
 	// Diffusion Tensor
 	double dPsi_dr() const;
