@@ -15,6 +15,7 @@ set( HELIOPROP_SRCS
      src/bfield.cpp
      src/bcomponents.cpp
      src/diffusiontensor.cpp
+     src/driftvelocity.cpp
      src/helioprop.cpp
      src/input.cpp
      src/particles.cpp

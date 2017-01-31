@@ -55,7 +55,7 @@ public:
 		Vsw_max = 760.0 * kms2UAd;
 		Vsw_min = Vsw;
 		B0 = Be / sqrt(1.0 + pow(Omega_Vsw * r0, 2));
-
+		reference_rigity = 4.0; // GV
 		set(0);
 	}
 
@@ -85,22 +85,12 @@ public:
 			Kperp_factor = Kperp_factor_constant;
 	}
 
-	inline double dGamma_dtheta() const {
-		return gamma / tan(theta);
-	} // gamma*cos(theta)*(3.0-pow(cos(theta),2))/(1.0+pow(cos(theta),2));
-
-	inline double dPsi_dr() const {
-		return 1.0 / (1.0 + gamma_squared) * gamma / r;
-	}
-	inline double dPsi_dtheta() const {
-		return 1.0 / (1.0 + gamma_squared) * dGamma_dtheta();
-	}
-
 	inline double GetVsw() const {
 		return Vsw;
 	}
 
 	// B components
+	double dGamma_dtheta() const;
 	double B_r() const;
 	double B_phi() const;
 	double B_total() const;
@@ -110,34 +100,20 @@ public:
 
 	// Drift velocity
 	void getDriftVelocity(std::vector<double>& vd);
-
+	double thetaprime() const;
+	double thetaprime(const double& r_, const double& phi_) const;
+	double thetaprime_phi() const;
+	double thetaprime_r() const;
+	double thetaprime_phi(const double& r_, const double& phi_) const;
+	double thetaprime_r(const double& r_, const double& phi_) const;
 	double distance_from_HCS(const double* xx);
 	double deriv_distance_from_HCS(const double* xx, unsigned int up);
 	double closest_distance();
 
-	inline double rL() {
+	/*inline double rL() {
 		return (3.3 / 149597870691.0) * momentum / B_total() / fabs(charge);
-	}
-	inline double thetaprime() const {
-		return PiOver2() + ASin(sin_alpha * sin(phi - phi_0 + Omega_Vsw * r));
-	}
-	inline double thetaprime(const double& r_, const double& phi_) {
-		return PiOver2() + ASin(sin_alpha * sin(phi_ - phi_0 + Omega_Vsw * r_));
-	}
-	inline double thetaprime_phi() {
-		return sin_alpha * cos(phi - phi_0 + Omega_Vsw * r)
-		/ sqrt(1.0 - pow(sin_alpha * sin(phi - phi_0 + Omega_Vsw * r), 2));
-	}  // to be revised
-	inline double thetaprime_r() {
-		return Omega_Vsw * thetaprime_phi();
-	}  // to be revised
-	inline double thetaprime_phi(const double& r_, const double& phi_) {
-		return sin_alpha * cos(phi_ - phi_0 + Omega_Vsw * r_)
-		/ sqrt(1.0 - pow(sin_alpha * sin(phi_ - phi_0 + Omega_Vsw * r_), 2));
-	}  // to be revised
-	inline double thetaprime_r(const double& r_, const double& phi_) {
-		return Omega_Vsw * thetaprime_phi(r_, phi_);
-	}  // to be revised
+	}*/
+
 	inline double beta() {
 		if (alpha == 0) {
 			return 0.0;
@@ -147,11 +123,14 @@ public:
 				/ sin(thetaprime()));
 		return fabs(b) * sgn(cos(phi - phi_0 + Omega_Vsw * r));
 	}
+
 	inline void SetPhi0(const double& phi0_) {
 		phi_0 = phi0_;
 	}
 
 	// Diffusion Tensor
+	double dPsi_dr() const;
+	double dPsi_dtheta() const;
 	double Kpar() const;
 	double dKpar_dr() const;
 	double dKpar_dphi() const;
@@ -192,6 +171,7 @@ protected:
 	double momentum;
 	double b;
 	double c;
+	double reference_rigity;
 };
 
 #endif

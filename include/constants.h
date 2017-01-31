@@ -16,7 +16,7 @@ const double kms2UAd = (24.0 * 60.0 * 60.0) / 149597870.691; // conversion facto
 const double SunRadius = 0.005; // Radius of the Sun [ UA ] . When a particle falls in it is lost
 const double MinEn = 0.001;  // Minimal energy to be considered [ GeV ]
 const double TMathC = 2.99792458e8;
-const double Clight = TMathC / 1e3 * kms2UAd;
+const double c_light = TMathC / 1e3 * kms2UAd;
 
 inline double sgn(const double& x) {
 	return (x > 0) - (x < 0);
