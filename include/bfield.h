@@ -3,18 +3,14 @@
 
 #include <vector>
 
-//#include "TMath.h"
-//#include "Math/Minimizer.h"
-//#include "Math/GSLMinimizer.h"
-//#include "Math/Functor.h"
-//#include "Minuit2/Minuit2Minimizer.h"
 #include "constants.h"
+#include "input.h"
 #include "TEnvironment.h"
 
-class TBfield {
+class Bfield {
 
 public:
-	TBfield() {
+	Bfield() {
 		r0 = 0;
 		Be = 0;
 		Ac = 0;
@@ -27,8 +23,7 @@ public:
 		set(0);
 	}
 
-	TBfield(double r0_,
-			double Be_,
+	Bfield(double Be_,
 			double Ac_,
 			double Omega_,
 			double Vsw_,
@@ -36,10 +31,7 @@ public:
 			double phi0_,
 			double lambda0_,
 			double kpfact_,
-			double deltaKpar_,
-			double b_,
-			double c_) :
-				r0(r0_),
+			double deltaKpar_) :
 				Be(Be_),
 				Ac(Ac_),
 				Omega(Omega_),
@@ -48,9 +40,8 @@ public:
 				phi_0(phi0_),
 				lambda_0(lambda0_),
 				Kperp_factor_constant(kpfact_),
-				delta_Kpar(deltaKpar_),
-				b(b_),
-				c(c_) {
+				delta_parallel_low(deltaKpar_) {
+		r0 = 1;
 		sin_alpha = sin(alpha);
 		Vsw_max = 760.0 * kms2UAd;
 		Vsw_min = Vsw;
@@ -59,7 +50,40 @@ public:
 		set(0);
 	}
 
-	~TBfield() {
+	// r0, Be, Ac, Omega, Vsw, alpha, phi0, lambda0
+	/*	double bp[12] = { 1,  // Earth position [UA]
+		input->MagField,  ///sqrt(2.0), // Reference magnetic field [T]
+		input->polarity, // Magnetic field polarity
+		TwoPi() / 27.0, // Solar differential rotation rate [d^-1]
+		400.0 * kms2UAd, // Velocity of solar wind (constant, radial) [ km/s --> UA/d ]
+		input->tiltangle * DegToRad(), // Tilt angle of current sheet [deg --> rad]
+		0, // Reference phi position of current sheet (basically not used, but useful to make the current sheet corotate with Sun)
+		input->lambda_par, // parallel mean-free-path [ UA ]
+		input->Kperp_factor, input->delta, input->b, input->c };*/
+
+	Bfield(const Input& input) {
+		r0 = 1.0;
+		Be = input.MagField;
+		Ac = input.polarity;
+		Omega = TwoPi() / 27.0;
+		Vsw = 400.0 * kms2UAd;
+		alpha = input.tiltangle * DegToRad();
+		phi_0 = 0.0;
+		lambda_0 = input.lambda_par;
+		Kperp_factor_constant = input.Kperp_factor;
+		delta_parallel_low = input.delta;
+		delta_parallel_high = input.delta;
+		//
+		r0 = 1;
+		sin_alpha = sin(alpha);
+		Vsw_max = 760.0 * kms2UAd;
+		Vsw_min = Vsw;
+		B0 = Be / sqrt(1.0 + pow(Omega_Vsw * r0, 2));
+		reference_rigity = 4.0; // GV
+		set(0);
+	}
+
+	~Bfield() {
 	}
 
 	void set(double value);
@@ -125,15 +149,14 @@ protected:
 	double psi;
 	double Omega_Vsw;
 	double sin_alpha;
-	double delta_Kpar;
+	double delta_parallel_low;
+	double delta_parallel_high;
 	double gamma;
 	double gamma_squared;
 	double qf;
 	double betavelocity;
 	double charge;
 	double momentum;
-	double b;
-	double c;
 	double reference_rigity;
 };
 

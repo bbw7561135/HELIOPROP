@@ -1,6 +1,6 @@
 #include "bfield.h"
 
-void TBfield::getDriftVelocity(std::vector<double>& vd) {
+void Bfield::getDriftVelocity(std::vector<double>& vd) {
 	double signfactors = sgn(charge) * Ac;
 	double velocity = betavelocity * c_light;
 	double LarmorRadius = (3.3 / 149597870691.0) * momentum / B_total() / fabs(charge);
@@ -26,7 +26,7 @@ void TBfield::getDriftVelocity(std::vector<double>& vd) {
 	vd[2] *= momfactor;
 }
 
-double TBfield::beta() const {
+double Bfield::beta() const {
 	if (alpha == 0) {
 		return 0.0;
 	}
@@ -36,33 +36,33 @@ double TBfield::beta() const {
 	return fabs(b) * sgn(cos(phi - phi_0 + Omega_Vsw * r));
 }
 
-double TBfield::thetaprime() const {
+double Bfield::thetaprime() const {
 	return PiOver2() + ASin(sin_alpha * sin(phi - phi_0 + Omega_Vsw * r));
 }
 
-double TBfield::thetaprime(const double& r_, const double& phi_) const {
+double Bfield::thetaprime(const double& r_, const double& phi_) const {
 	return PiOver2() + ASin(sin_alpha * sin(phi_ - phi_0 + Omega_Vsw * r_));
 }
 
-double TBfield::thetaprime_phi() const {
+double Bfield::thetaprime_phi() const {
 	return sin_alpha * cos(phi - phi_0 + Omega_Vsw * r)
 	/ sqrt(1.0 - pow(sin_alpha * sin(phi - phi_0 + Omega_Vsw * r), 2));
 }  // to be revised
 
-double TBfield::thetaprime_r() const {
+double Bfield::thetaprime_r() const {
 	return Omega_Vsw * thetaprime_phi();
 }  // to be revised
 
-double TBfield::thetaprime_phi(const double& r_, const double& phi_) const {
+double Bfield::thetaprime_phi(const double& r_, const double& phi_) const {
 	return sin_alpha * cos(phi_ - phi_0 + Omega_Vsw * r_)
 	/ sqrt(1.0 - pow(sin_alpha * sin(phi_ - phi_0 + Omega_Vsw * r_), 2));
 }  // to be revised
 
-double TBfield::thetaprime_r(const double& r_, const double& phi_) const {
+double Bfield::thetaprime_r(const double& r_, const double& phi_) const {
 	return Omega_Vsw * thetaprime_phi(r_, phi_);
 }  // to be revised
 
-double TBfield::distance_from_HCS(const double* xx) {
+double Bfield::distance_from_HCS(const double* xx) {
 	double thetap = thetaprime(xx[0], xx[1]);
 	double rp = xx[0];
 	double phip = xx[1];
@@ -72,7 +72,7 @@ double TBfield::distance_from_HCS(const double* xx) {
 	return xmxp2 + ymyp2 + zmzp2;
 }
 
-double TBfield::deriv_distance_from_HCS(const double* xx, unsigned int up) {
+double Bfield::deriv_distance_from_HCS(const double* xx, unsigned int up) {
 	double thetap = thetaprime(xx[0], xx[1]);
 	double rp = xx[0];
 	double phip = xx[1];
@@ -109,7 +109,7 @@ double TBfield::deriv_distance_from_HCS(const double* xx, unsigned int up) {
 	return -1;
 }
 
-double TBfield::closest_distance() {
+double Bfield::closest_distance() {
 
 	if (alpha == 0) {
 		return fabs(r * cos(theta));

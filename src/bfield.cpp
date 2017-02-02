@@ -1,10 +1,10 @@
 #include "bfield.h"
 
-void TBfield::set(double value) {
+void Bfield::set(double value) {
 	set(value, value, value, value, value, value, value);
 }
 
-void TBfield::set(double r_, double theta_, double phi_, double qf_, double beta_, double momentum_, double charge_) {
+void Bfield::set(double r_, double theta_, double phi_, double qf_, double beta_, double momentum_, double charge_) {
 	r = r_;
 	theta = theta_;
 	phi = phi_;

@@ -19,15 +19,15 @@
 int main(int argc, char** argv) {
 	Timer tmr;
 	Input input;
-
-	if (argc == 2)
+	if (argc == 2) {
 		input.load_file(argv[1]);
-
-	if (argc > 2) {
-		std::cerr << "Usage: ./HELIOPROP <xml input file>" << "\n";
-		exit(-1);
+		TRandomNumberGenerator rn(input.seed);
+		Bfield bfield(input);
 	}
-
+	else {
+		std::cerr << "Usage: ./HELIOPROP <xml input file>" << "\n";
+	}
+	std::cout << "Helioprop ends in " << tmr.elapsed() << " seconds.\n";
 
 #ifdef HELIOPROP
 
@@ -35,21 +35,6 @@ int main(int argc, char** argv) {
 	//TNtupleD* nt = new TNtupleD("nt", "Positions", "pid:q0:rf:thetaf:phif:qf:af:alphaf:tf:iE");
 	//TNtupleD* header = new TNtupleD("header", "Init data", "dt:Nparticles:NE:logEmin:logEmax");
 	//TRandom3* rn = new TRandom3(inp->seed);
-
-	TRandomNumberGenerator rn(input->seed);
-
-	std::cout << input->seed << "\n";
-
-	// r0, Be, Ac, Omega, Vsw, alpha, phi0, lambda0
-	double bp[12] = { 1,  // Earth position [UA]
-			input->MagField,  ///sqrt(2.0), // Reference magnetic field [T]
-			input->polarity, // Magnetic field polarity
-			TwoPi() / 27.0, // Solar differential rotation rate [d^-1]
-			400.0 * kms2UAd, // Velocity of solar wind (constant, radial) [ km/s --> UA/d ]
-			input->tiltangle * DegToRad(), // Tilt angle of current sheet [deg --> rad]
-			0, // Reference phi position of current sheet (basically not used, but useful to make the current sheet corotate with Sun)
-			input->lambda_par, // parallel mean-free-path [ UA ]
-			input->Kperp_factor, input->delta, input->b, input->c };
 
 	const double tl = 0;
 	TEnvironment* env = new TEnvironment(tl,
@@ -137,7 +122,6 @@ int main(int argc, char** argv) {
 	//outfile->Close();
 	delete env;
 #endif
-	std::cout << "Helioprop ends in " << tmr.elapsed() << " seconds.\n";
 	return 0;
 }
 

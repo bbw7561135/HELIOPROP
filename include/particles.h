@@ -63,7 +63,7 @@ protected:
 	std::vector<double> vd;
 	std::vector<double> Ktensor;
 	std::vector<double> Kderiv;
-	TBfield bf;
+	Bfield bf;
 };
 
 #endif
