@@ -13,7 +13,7 @@
 
 class TPseudoParticle {
 public:
-	TPseudoParticle(const PARTICLETYPE& hd, const double& A_, const double& rf_,
+	TPseudoParticle(const double& A_, const double& rf_,
 			const double& phif_, const double& thetaf_, const double& qf_,
 			const double& tf_, const double& af_, const double& alphaf_,
 			const double& charge_, double* bparam);

@@ -8,10 +8,6 @@
 
 #include <cmath>
 
-typedef enum {
-	NUCLEUS, LEPTON
-} PARTICLETYPE;
-
 const double kms2UAd = (24.0 * 60.0 * 60.0) / 149597870.691; // conversion factor from km/s to UA/d
 const double SunRadius = 0.005; // Radius of the Sun [ UA ] . When a particle falls in it is lost
 const double MinEn = 0.001;  // Minimal energy to be considered [ GeV ]

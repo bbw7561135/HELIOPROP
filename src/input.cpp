@@ -1,19 +1,10 @@
 #include "input.h"
 
-std::string str(PARTICLETYPE p) {
-	if (p == NUCLEUS)
-		return "nucleus";
-	else if (p == LEPTON)
-		return "lepton";
-	else
-		return "unkown type";
-}
-
 void Input::set_default_values() {
 	output_filename = "output/default.helioprop";
 	Anumber = 1;
 	Znumber = 1;
-	particle_type = NUCLEUS;
+	is_lepton = false;
 	particle_number = 1000;
 	kenergyn_min = 0.1;
 	kenergyn_max = 1e3;
@@ -69,10 +60,7 @@ void Input::load_input(pugi::xml_node root) {
 	particle_number = childIntValue(root, "ParticleNumber", 1000);
 	Znumber = childIntValue(root, "ParticleCharge", 1);
 	Anumber = childIntValue(root, "ParticleAtomicNumber", 1);
-	if (Anumber == 0)
-		particle_type = LEPTON;
-	else
-		particle_type = NUCLEUS;
+	is_lepton = (Anumber == 0);
 	lambda_par = childDoubleValue(root, "ParallelMfp", lambda_par);
 	MagField = childDoubleValue(root, "BfieldAtSun", MagField);
 	delta_low = childDoubleValue(root, "Delta", delta_low);
@@ -97,7 +85,10 @@ void Input::print() {
 	std::cout << "- particle number = " << particle_number << "\n";
 	std::cout << "- charge = " << Znumber << "\n";
 	std::cout << "- atomic number = " << Anumber << "\n";
-	std::cout << "- type = " << str(particle_type) << "\n";
+	if (is_lepton)
+		std::cout << "- type = lepton\n";
+	else
+		std::cout << "- type = nucleus\n";
 	std::cout << "- parallel mean free path = " << lambda_par << "\n";
 	std::cout << "- B field at Sun = " << MagField << "\n";
 	std::cout << "- delta = " << delta_low << " - " << delta_hi << "\n";

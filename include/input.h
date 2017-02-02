@@ -6,16 +6,9 @@
 
 #include "constants.h"
 #include "errorcode.h"
-#include "tinystr.h"
-#include "tinyxml.h"
 #include "pugi_wrapper.h"
 
 class Input {
-
-private:
-	int QueryIntAttribute(std::string, TiXmlElement*) const;
-	double QueryDoubleAttribute(std::string, TiXmlElement*) const;
-
 public:
 	Input() {
 		set_default_values();
@@ -32,8 +25,6 @@ public:
 	std::string xml_filename;
 	std::string output_filename;
 
-	int seed;
-
 	double Kperp_factor;
 	double lambda_par;
 	double delta_low;
@@ -44,15 +35,14 @@ public:
 	double tiltangle;
 	double Rmax;
 	double dt;
-
 	double kenergyn_min;
 	double kenergyn_max;
 	size_t kenergyn_size;
-
 	size_t particle_number;
-	PARTICLETYPE particle_type;
+	bool is_lepton;
 	unsigned int Anumber;
 	int Znumber;
+	int seed;
 };
 
 #endif

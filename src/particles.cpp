@@ -1,7 +1,6 @@
 #include "particles.h"
 
 TPseudoParticle::TPseudoParticle(
-		const PARTICLETYPE& hd,
 		const double& A_,
 		const double& rf_,
 		const double& phif_,
@@ -23,8 +22,12 @@ TPseudoParticle::TPseudoParticle(
 		iE(qf_),
 		charge(charge_)
 {
-	if (hd == NUCLEUS) M = 0.938;
-	else if (hd == LEPTON) M = 0.000511;
+	if (A == 0) {
+		M = 0.000511;
+	}
+	else {
+		M = 0.938;
+	}
 	bf = Bfield();//bparam[0],bparam[1],bparam[2],bparam[3],bparam[4], bparam[5], bparam[6], bparam[7], bparam[8], bparam[9], bparam[10], bparam[11]);
 	dW = std::vector<double>(4,0);
 	vd = std::vector<double>(3,0);

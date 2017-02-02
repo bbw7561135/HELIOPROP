@@ -28,9 +28,9 @@ list(APPEND HELIOPROP_EXTRA_INCLUDES libs/pugixml/include)
 list(APPEND HELIOPROP_EXTRA_LIBRARIES pugixml)
 
 # TINYXML (provided)
-add_subdirectory(libs/tinyxml)
-list(APPEND HELIOPROP_EXTRA_INCLUDES libs/tinyxml/include)
-list(APPEND HELIOPROP_EXTRA_LIBRARIES tinyxml)
+#add_subdirectory(libs/tinyxml)
+#list(APPEND HELIOPROP_EXTRA_INCLUDES libs/tinyxml/include)
+#list(APPEND HELIOPROP_EXTRA_LIBRARIES tinyxml)
 
 # GSL (external)
 find_package(GSL)
