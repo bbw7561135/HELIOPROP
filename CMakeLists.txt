@@ -19,7 +19,13 @@ set( HELIOPROP_SRCS
      src/helioprop.cpp
      src/input.cpp
      src/particles.cpp
+     src/pugi_wrapper.cpp
 )
+
+# PUGIXML (provided)
+add_subdirectory(libs/pugixml)
+list(APPEND HELIOPROP_EXTRA_INCLUDES libs/pugixml/include)
+list(APPEND HELIOPROP_EXTRA_LIBRARIES pugixml)
 
 # TINYXML (provided)
 add_subdirectory(libs/tinyxml)

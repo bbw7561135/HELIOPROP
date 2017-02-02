@@ -11,23 +11,25 @@
 #include "particles.h"
 #include "Bfield.h"
 #include "input.h"
+#include "Timer.h"
 
 //#include "config.h" // deprecated
 //#include "RConfigure.h"
 
 int main(int argc, char** argv) {
+	Timer tmr;
+	Input input;
 
-	if (argc != 2) {
-		std::cerr << "Usage: ./HelioMod <xml input file>" << "\n";
+	if (argc == 2)
+		input.load_file(argv[1]);
+
+	if (argc > 2) {
+		std::cerr << "Usage: ./HELIOPROP <xml input file>" << "\n";
 		exit(-1);
 	}
 
-	//TStopwatch ts;
-	//ts.Start();
 
-	Input* input = new Input(argv[1]);
-	//input->load_file(argv[1]);
-	//input->print();
+#ifdef HELIOPROP
 
 	//TFile* outfile = new TFile(inp->outputfilename.c_str(), "RECREATE");
 	//TNtupleD* nt = new TNtupleD("nt", "Positions", "pid:q0:rf:thetaf:phif:qf:af:alphaf:tf:iE");
@@ -134,13 +136,8 @@ int main(int argc, char** argv) {
 	//nt->Write();
 	//outfile->Close();
 	delete env;
-	delete input;
-
-	//ts.Stop();
-
-	//std::cout << "Ended in " << ts.RealTime() << " s. Actual CPU time "
-	//		<< ts.CpuTime() << "\n";
-
+#endif
+	std::cout << "Helioprop ends in " << tmr.elapsed() << " seconds.\n";
 	return 0;
 }
 
