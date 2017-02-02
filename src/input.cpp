@@ -96,4 +96,5 @@ void Input::print() {
 	std::cout << "- perpendicular diffusion = " << Kperp_factor << "\n";
 	std::cout << "- polarity = " << polarity << "\n";
 	std::cout << "- tilt angle = " << tiltangle << "\n";
+	std::cout << "\n";
 }

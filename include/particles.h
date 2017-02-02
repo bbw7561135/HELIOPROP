@@ -21,7 +21,7 @@ public:
 	~TPseudoParticle() {
 	}
 
-	void Evolve(const TEnvironment* env, const TRandomNumberGenerator& rn);
+	void Evolve(const Environment* env, const TRandomNumberGenerator& rn);
 
 	inline double momentum(const double& qf) {
 		return Anumber * sqrt(pow(qf + M, 2) - pow(M, 2));

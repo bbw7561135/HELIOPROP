@@ -15,6 +15,15 @@ public:
 			axis.push_back(value);
 		}
 	}
+	~EnergyAxis() {
+		axis.clear();
+	}
+	size_t get_size() {
+		return size;
+	}
+	double at(const size_t& i) {
+		return axis.at(i);
+	}
 private:
 	std::vector<double> axis;
 	size_t size;

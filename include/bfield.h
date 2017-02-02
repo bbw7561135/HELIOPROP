@@ -4,8 +4,8 @@
 #include <vector>
 
 #include "constants.h"
+#include "environment.h"
 #include "input.h"
-#include "TEnvironment.h"
 
 class Bfield {
 

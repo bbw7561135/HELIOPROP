@@ -33,8 +33,8 @@ public:
 	double MagField;
 	double polarity;
 	double tiltangle;
-	double Rmax;
-	double dt;
+	double Rmax; // Rmax = Radius of the HelioPause [ UA ]
+	double dt; // Integration backward time step [ d ]
 	double kenergyn_min;
 	double kenergyn_max;
 	size_t kenergyn_size;

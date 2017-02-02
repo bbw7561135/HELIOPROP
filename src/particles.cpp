@@ -35,10 +35,10 @@ TPseudoParticle::TPseudoParticle(
 	Kderiv = std::vector<double>(5,0);
 }
 
-void TPseudoParticle::Evolve(const TEnvironment* env, const TRandomNumberGenerator& rn) {
+void TPseudoParticle::Evolve(const Environment* env, const TRandomNumberGenerator& rn) {
 
-	const double Rmax = env->GetRmax();
-	const double dt0 = env->Getdt();
+	const double Rmax = env->get_rmax();
+	const double dt0 = env->get_dt();
 
 	while (rf < Rmax && rf > SunRadius) {
 		bf.set(rf, thetaf, phif, qf, beta_velocity(qf), momentum(qf), charge);
