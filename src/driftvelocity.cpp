@@ -37,11 +37,11 @@ double Bfield::beta() const {
 }
 
 double Bfield::thetaprime() const {
-	return PiOver2() + ASin(sin_alpha * sin(phi - phi_0 + Omega_Vsw * r));
+	return PiOver2 + ASin(sin_alpha * sin(phi - phi_0 + Omega_Vsw * r));
 }
 
 double Bfield::thetaprime(const double& r_, const double& phi_) const {
-	return PiOver2() + ASin(sin_alpha * sin(phi_ - phi_0 + Omega_Vsw * r_));
+	return PiOver2 + ASin(sin_alpha * sin(phi_ - phi_0 + Omega_Vsw * r_));
 }
 
 double Bfield::thetaprime_phi() const {

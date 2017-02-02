@@ -26,5 +26,7 @@
 
 # Libs
 build/
-
+.cproject
+.project
+.settings/
 

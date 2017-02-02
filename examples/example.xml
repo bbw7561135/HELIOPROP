@@ -1,0 +1,16 @@
+<Helioprop>
+    <RandomGeneratorSeed value = "10" />
+    <HeliosphereRadius value = "100" />
+    <TimeStep value = "0.001" />
+    <KEnergyNucMin value = "0.1" />
+    <KEnergyNucMax value = "1e3" />
+    <KEnergyNucSize value = "40" />
+    <ParticleNumber value = "100" />
+    <ParticleCharge value = "1" />
+    <ParticleAtomicNumber value = "0" />
+    <ParallelMfp value = "0" />
+    <Delta value = "0.5" />
+    <PerpendicularDiffusion value = "1" />
+    <Polarity value = "1" />
+    <TiltAngle value = "20" />
+</Helioprop>

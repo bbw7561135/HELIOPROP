@@ -36,7 +36,6 @@ int main(int argc, char** argv) {
 	//TFile* outfile = new TFile(inp->outputfilename.c_str(), "RECREATE");
 	//TNtupleD* nt = new TNtupleD("nt", "Positions", "pid:q0:rf:thetaf:phif:qf:af:alphaf:tf:iE");
 	//TNtupleD* header = new TNtupleD("header", "Init data", "dt:Nparticles:NE:logEmin:logEmax");
-	//TRandom3* rn = new TRandom3(inp->seed);
 
 	const double tl = 0;
 	TEnvironment* env = new TEnvironment(tl,
@@ -45,11 +44,6 @@ int main(int argc, char** argv) {
 
 	const int Nparticles = input->particle_number;
 	const double charge = double(input->Znumber);
-
-	double logEmin;
-	double logEmax;
-	int NE;
-
 
 	int particleID = 0;
 

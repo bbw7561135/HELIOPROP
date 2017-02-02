@@ -22,7 +22,7 @@ TPseudoParticle::TPseudoParticle(
 		iE(qf_),
 		charge(charge_)
 {
-	if (A == 0) {
+	if (A_ == 0) {
 		M = 0.000511;
 	}
 	else {
@@ -53,7 +53,7 @@ void TPseudoParticle::Evolve(const TEnvironment* env, const TRandomNumberGenerat
 
 		for (int j = 0; j < 2; j++) {
 			double R1 = std::sqrt(-2.0 * log(rn.getRandomNumber()));
-			double R2 = TwoPi() * rn.getRandomNumber();
+			double R2 = TwoPi * rn.getRandomNumber();
 			dW[2*j] = R1 * cos(R2) * sqrtdt;
 			dW[2*j+1] = R1 * sin(R2) * sqrtdt;
 		}
@@ -80,7 +80,7 @@ void TPseudoParticle::Evolve(const TEnvironment* env, const TRandomNumberGenerat
 		qf += AE*dt;
 
 		// Consistency conditions
-		thetaf = fmod(thetaf, TwoPi());
+		thetaf = fmod(thetaf, TwoPi);
 
 		if (thetaf < 0) {
 			thetaf *= -1.0;
@@ -88,7 +88,7 @@ void TPseudoParticle::Evolve(const TEnvironment* env, const TRandomNumberGenerat
 		}
 
 		if (thetaf > M_PI) {
-			thetaf = TwoPi() - thetaf;
+			thetaf = TwoPi - thetaf;
 			phif += M_PI;
 		}
 
@@ -98,9 +98,9 @@ void TPseudoParticle::Evolve(const TEnvironment* env, const TRandomNumberGenerat
 			rf *= -1.0;
 		}
 
-		phif = fmod(phif, TwoPi());
+		phif = fmod(phif, TwoPi);
 		if (phif < 0)
-			phif += TwoPi();
+			phif += TwoPi;
 	}
 
 	af += boundarycondition(qf,tf,rf);

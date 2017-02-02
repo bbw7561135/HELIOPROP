@@ -17,7 +17,7 @@ void Bfield::set(double r_, double theta_, double phi_, double qf_, double beta_
 	gamma = Omega_Vsw * r * sin(theta);
 	gamma_squared = pow(gamma, 2);
 	psi = atan(gamma);
-	if (theta < 30.0 * DegToRad() || theta > 150.0 * DegToRad())
+	if (theta < 30.0 * DegToRad || theta > 150.0 * DegToRad)
 		Kperp_factor = 10.0 * Kperp_factor_constant;
 	else
 		Kperp_factor = Kperp_factor_constant;

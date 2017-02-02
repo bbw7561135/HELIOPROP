@@ -65,9 +65,9 @@ public:
 		r0 = 1.0;
 		Be = input.MagField;
 		Ac = input.polarity;
-		Omega = TwoPi() / 27.0;
+		Omega = TwoPi / 27.0;
 		Vsw = 400.0 * kms2UAd;
-		alpha = input.tiltangle * DegToRad();
+		alpha = input.tiltangle * DegToRad;
 		phi_0 = 0.0;
 		lambda_0 = input.lambda_par;
 		Kperp_factor_constant = input.Kperp_factor;
