@@ -71,8 +71,8 @@ public:
 		phi_0 = 0.0;
 		lambda_0 = input.lambda_par;
 		Kperp_factor_constant = input.Kperp_factor;
-		delta_parallel_low = input.delta;
-		delta_parallel_high = input.delta;
+		delta_parallel_low = input.delta_low;
+		delta_parallel_high = input.delta_hi;
 		//
 		r0 = 1;
 		sin_alpha = sin(alpha);

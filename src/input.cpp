@@ -13,6 +13,21 @@ void Input::set_default_values() {
 	output_filename = "output/default.helioprop";
 	Anumber = 1;
 	Znumber = 1;
+	particle_type = NUCLEUS;
+	particle_number = 1000;
+	kenergyn_min = 0.1;
+	kenergyn_max = 1e3;
+	kenergyn_size = 40;
+	delta_low = 0.34;
+	delta_hi = 0.34;
+	reference_rigidity = 4;
+	Kperp_factor = 1;
+	lambda_par = 1;
+	MagField = 0;
+	polarity = 0;
+	tiltangle = 20;
+	Rmax = 100;
+	dt = 1e-3;
 }
 
 void Input::set_output_filename() {
@@ -60,18 +75,12 @@ void Input::load_input(pugi::xml_node root) {
 		particle_type = NUCLEUS;
 	lambda_par = childDoubleValue(root, "ParallelMfp", lambda_par);
 	MagField = childDoubleValue(root, "BfieldAtSun", MagField);
-	delta = childDoubleValue(root, "Delta", delta);
+	delta_low = childDoubleValue(root, "Delta", delta_low);
+	delta_low = childDoubleValue(root, "DeltaLow", delta_low);
+	delta_hi = childDoubleValue(root, "Delta", delta_hi);
+	delta_hi = childDoubleValue(root, "DeltaHigh", delta_hi);
+	reference_rigidity = childDoubleValue(root, "ReferenceRigidity", reference_rigidity);
 	Kperp_factor = childDoubleValue(root, "PerpendicularDiffusion", Kperp_factor);
-	/*		rig_break = false;
-		b = 0.;
-		c = 0.;
-		el1 = tixmlel->FirstChildElement("Break");
-		if (el1) {
-			rig_break = true;
-			b = QueryDoubleAttribute("b", el1);
-			c = QueryDoubleAttribute("c", el1);
-		}
-	 */
 	polarity = childDoubleValue(root, "Polarity", polarity);
 	tiltangle = childDoubleValue(root, "TiltAngle", tiltangle);
 }
@@ -91,7 +100,8 @@ void Input::print() {
 	std::cout << "- type = " << str(particle_type) << "\n";
 	std::cout << "- parallel mean free path = " << lambda_par << "\n";
 	std::cout << "- B field at Sun = " << MagField << "\n";
-	std::cout << "- delta = " << delta << "\n";
+	std::cout << "- delta = " << delta_low << " - " << delta_hi << "\n";
+	std::cout << "- ref rigidity = " << reference_rigidity << "\n";
 	std::cout << "- perpendicular diffusion = " << Kperp_factor << "\n";
 	std::cout << "- polarity = " << polarity << "\n";
 	std::cout << "- tilt angle = " << tiltangle << "\n";

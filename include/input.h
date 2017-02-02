@@ -36,7 +36,9 @@ public:
 
 	double Kperp_factor;
 	double lambda_par;
-	double delta;
+	double delta_low;
+	double delta_hi;
+	double reference_rigidity;
 	double MagField;
 	double polarity;
 	double tiltangle;
@@ -51,10 +53,6 @@ public:
 	PARTICLETYPE particle_type;
 	unsigned int Anumber;
 	int Znumber;
-
-	bool rig_break;
-	double b;
-	double c;
 };
 
 #endif

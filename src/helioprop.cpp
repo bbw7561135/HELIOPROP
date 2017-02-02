@@ -10,6 +10,7 @@
 #include "constants.h"
 #include "particles.h"
 #include "Bfield.h"
+#include "energyaxis.h"
 #include "input.h"
 #include "Timer.h"
 
@@ -23,6 +24,7 @@ int main(int argc, char** argv) {
 		input.load_file(argv[1]);
 		TRandomNumberGenerator rn(input.seed);
 		Bfield bfield(input);
+		EnergyAxis energy(input);
 	}
 	else {
 		std::cerr << "Usage: ./HELIOPROP <xml input file>" << "\n";
@@ -48,36 +50,7 @@ int main(int argc, char** argv) {
 	double logEmax;
 	int NE;
 
-	std::vector<double> enPam;
 
-	if (input->Pamelamode == false) {
-		if (input->SingleEnergy) {
-			NE = 1;
-			logEmin = log10(input->kenergy_min);
-			logEmax = log10(input->kenergy_min);
-			enPam.push_back(input->kenergy_min);
-		} else {
-			logEmin = log10(input->kenergy_min);
-			logEmax = log10(input->kenergy_max);
-			NE = input->kenergy_size;
-			for (int iE = 0; iE < NE; iE++)
-				enPam.push_back(
-						pow(10,
-								logEmin
-								+ double(iE) / double(NE - 1)
-								* (logEmax - logEmin)));
-		}
-	} else {
-		std::ifstream Pamenergy("energy_Pamela.dat", std::ios::in);
-		double Pamq0;
-		while (Pamenergy >> Pamq0)
-			enPam.push_back(Pamq0);
-		Pamenergy.close();
-
-		logEmin = log10(enPam.front());
-		logEmax = log10(enPam.back());
-		NE = enPam.size();
-	}
 	int particleID = 0;
 
 	//header->Fill(env->Getdt(), double(Nparticles), double(NE), logEmin, logEmax);
@@ -117,7 +90,6 @@ int main(int argc, char** argv) {
 			}
 		}
 	}
-
 	//nt->Write();
 	//outfile->Close();
 	delete env;

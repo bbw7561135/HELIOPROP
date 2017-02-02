@@ -25,7 +25,7 @@ TPseudoParticle::TPseudoParticle(
 {
 	if (hd == NUCLEUS) M = 0.938;
 	else if (hd == LEPTON) M = 0.000511;
-	bf = Bfield(bparam[0],bparam[1],bparam[2],bparam[3],bparam[4], bparam[5], bparam[6], bparam[7], bparam[8], bparam[9], bparam[10], bparam[11]);
+	bf = Bfield();//bparam[0],bparam[1],bparam[2],bparam[3],bparam[4], bparam[5], bparam[6], bparam[7], bparam[8], bparam[9], bparam[10], bparam[11]);
 	dW = std::vector<double>(4,0);
 	vd = std::vector<double>(3,0);
 	Ktensor = std::vector<double>(4,0);
