@@ -1,6 +1,8 @@
 #ifndef HELIOPROP_GSLMINIMIZER_H_
 #define HELIOPROP_GSLMINIMIZER_H_
 
+#include <cassert>
+#include <cmath>
 #include "gsl/gsl_multimin.h"
 
 double gsl_f(const gsl_vector *v, void *params) {
@@ -47,7 +49,7 @@ public:
 	~GSLMinimizer() {
 		gsl_multimin_fdfminimizer_free(s);
 	}
-	double minimize(Bfield* ptr) {
+	double minimize(Bfield* ptr, double r, double phi) {
 		gsl_vector *x;
 		gsl_multimin_function_fdf func;
 
@@ -57,10 +59,10 @@ public:
 		func.n = n_params;
 		func.params = ptr;
 
-		/* Starting point, x = (5,7) */
+		/* Starting point */
 		x = gsl_vector_alloc(2);
-		gsl_vector_set(x, 0, 5.0);
-		gsl_vector_set(x, 1, 7.0);
+		gsl_vector_set(x, 0, r);
+		gsl_vector_set(x, 1, phi);
 
 		gsl_multimin_fdfminimizer_set(s, &func, x, step_size, tol);
 
@@ -76,13 +78,22 @@ public:
 		if (status == GSL_SUCCESS)
 			std::cout << "Minimum found!" << "\n";
 
+		double r_found = gsl_vector_get(s->x, 0);
+		double phi_found = gsl_vector_get(s->x, 1);
+
 		std::cout << iter << "\t" << gsl_vector_get(s->x, 0) << "\t"
 				<< gsl_vector_get(s->x, 1) << "\n";
+
+		assert(r_found > 0);
+		assert(phi_found > 0 && phi_found < 2.0 * M_PI);
+
+
 		std::cout << s->f << "\n";
 
 		gsl_vector_free (x);
 
-		return s->f;
+
+		return sqrt(s->f);
 	}
 protected:
 	double step_size;
@@ -141,57 +152,57 @@ protected:
  return std::sqrt(distance_from_HCS(xs));*/
 
 //min.SetMaxIterations(10000);
-	size_t max_iter = 10000;
-	//min.SetTolerance(0.1);
-	double tol = 1e-2;
-	double step_size = 0.01;
-	size_t iter = 0;
-	int status;
+size_t max_iter = 10000;
+//min.SetTolerance(0.1);
+double tol = 1e-2;
+double step_size = 0.01;
+size_t iter = 0;
+int status;
 
-	const gsl_multimin_fdfminimizer_type *T;
-	gsl_multimin_fdfminimizer *s;
+const gsl_multimin_fdfminimizer_type *T;
+gsl_multimin_fdfminimizer *s;
 
-	/* Position of the minimum (1,2), scale factors
+/* Position of the minimum (1,2), scale factors
 	 10,20, height 30. */
-	double par[5] = { 1.0, 2.0, 10.0, 20.0, 30.0 };
+double par[5] = { 1.0, 2.0, 10.0, 20.0, 30.0 };
 
-	gsl_vector *x;
-	gsl_multimin_function_fdf F;
+gsl_vector *x;
+gsl_multimin_function_fdf F;
 
-	F.n = 2;
-	F.f = my_f;
-	F.df = my_df;
-	F.fdf = my_fdf;
-	F.params = par;
+F.n = 2;
+F.f = my_f;
+F.df = my_df;
+F.fdf = my_fdf;
+F.params = par;
 
-	/* Starting point, x = (r + 1.0, phi) */
-	x = gsl_vector_alloc(2);
-	gsl_vector_set(x, 0, r + 1.0);
-	gsl_vector_set(x, 1, phi);
+/* Starting point, x = (r + 1.0, phi) */
+x = gsl_vector_alloc(2);
+gsl_vector_set(x, 0, r + 1.0);
+gsl_vector_set(x, 1, phi);
 
-	T = gsl_multimin_fdfminimizer_conjugate_fr;
-	s = gsl_multimin_fdfminimizer_alloc(T, 2);
+T = gsl_multimin_fdfminimizer_conjugate_fr;
+s = gsl_multimin_fdfminimizer_alloc(T, 2);
 
-	gsl_multimin_fdfminimizer_set(s, &F, x, step_size, tol);
+gsl_multimin_fdfminimizer_set(s, &F, x, step_size, tol);
 
-	do {
-		iter++;
-		status = gsl_multimin_fdfminimizer_iterate(s);
+do {
+	iter++;
+	status = gsl_multimin_fdfminimizer_iterate(s);
 
-		if (status)
-			break;
+	if (status)
+		break;
 
-		status = gsl_multimin_test_gradient(s->gradient, 1e-3);
+	status = gsl_multimin_test_gradient(s->gradient, 1e-3);
 
-		if (status == GSL_SUCCESS)
-			printf("Minimum found at:\n");
+	if (status == GSL_SUCCESS)
+		printf("Minimum found at:\n");
 
-		std::cout << iter << "\t" << gsl_vector_get(s->x, 0) << "\t"
-				<< gsl_vector_get(s->x, 1) << "\t" << s->f << "\n";
-	} while (status == GSL_CONTINUE && iter < max_iter);
+	std::cout << iter << "\t" << gsl_vector_get(s->x, 0) << "\t"
+			<< gsl_vector_get(s->x, 1) << "\t" << s->f << "\n";
+} while (status == GSL_CONTINUE && iter < max_iter);
 
-	gsl_multimin_fdfminimizer_free(s);
-	gsl_vector_free(x);
+gsl_multimin_fdfminimizer_free(s);
+gsl_vector_free(x);
 #endif
 
 #endif /* INCLUDE_GSLMINIMIZER_H_ */

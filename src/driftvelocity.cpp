@@ -111,7 +111,7 @@ double Bfield::closest_distance() {
 	}
 
 	GSLMinimizer f;
-	std::cout << f.minimize(this) << "\n";
+	std::cout << f.minimize(this, r + 1.0, phi) << "\n";
 
 	return 0;
 }
