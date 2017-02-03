@@ -6,9 +6,9 @@
 #include "constants.h"
 #include "environment.h"
 #include "input.h"
+#include "utilities.h"
 
 class Bfield {
-
 public:
 	Bfield() {
 		r0 = 0;
@@ -63,13 +63,13 @@ public:
 
 	Bfield(const Input& input) {
 		r0 = 1.0;
-		Be = input.MagField;
+		Be = input.bfield_earth;
 		Ac = input.polarity;
 		Omega = TwoPi / 27.0;
 		Vsw = 400.0 * kms2UAd;
 		alpha = input.tiltangle * DegToRad;
 		phi_0 = 0.0;
-		lambda_0 = input.lambda_par;
+		lambda_0 = input.parallel_mfp;
 		Kperp_factor_constant = input.Kperp_factor;
 		delta_parallel_low = input.delta_low;
 		delta_parallel_high = input.delta_hi;
@@ -111,8 +111,8 @@ public:
 	double thetaprime_phi(const double& r_, const double& phi_) const;
 	double thetaprime_r(const double& r_, const double& phi_) const;
 	double beta() const;
-	double distance_from_HCS(const double* xx);
-	double deriv_distance_from_HCS(const double* xx, unsigned int up);
+	double distance_from_HCS(const double& rp, const double& phip);
+	double deriv_distance_from_HCS(const double& rp, const double& phip, unsigned int up);
 	double closest_distance();
 
 	// Diffusion Tensor

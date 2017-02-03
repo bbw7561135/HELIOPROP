@@ -15,6 +15,10 @@ int main(int argc, char** argv) {
 		input.load_file(argv[1]);
 		TRandomNumberGenerator rn(input.seed);
 		Bfield bfield(input);
+		bfield.closest_distance();
+
+		exit(1);
+
 		EnergyAxis energy(input);
 		Environment env(0, input.Rmax, input.dt);
 

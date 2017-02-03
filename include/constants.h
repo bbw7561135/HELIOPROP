@@ -16,25 +16,5 @@ static const double DegToRad = M_PI / 180.0;
 static const double PiOver2 = M_PI / 2.0;
 static const double TwoPi = 2.0 * M_PI;
 
-inline double sgn(const double& x) {
-	return (x > 0) - (x < 0);
-}
-
-inline double Heaviside(const double& x) {
-	if (x > 0)
-		return -1;
-	if (x < 0)
-		return 1;
-	return 1e-30;
-}
-
-inline double ASin(const double& x) {
-	if (x < -1.)
-		return -M_PI / 2.;
-	if (x >  1.)
-		return  M_PI / 2.;
-	return asin(x);
-}
-
 #endif
 

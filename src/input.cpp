@@ -13,8 +13,8 @@ void Input::set_default_values() {
 	delta_hi = 0.34;
 	reference_rigidity = 4;
 	Kperp_factor = 1;
-	lambda_par = 1;
-	MagField = 0;
+	parallel_mfp = 1;
+	bfield_earth = 5;
 	polarity = 0;
 	tiltangle = 20;
 	Rmax = 100;
@@ -61,8 +61,8 @@ void Input::load_input(pugi::xml_node root) {
 	Znumber = childIntValue(root, "ParticleCharge", 1);
 	Anumber = childIntValue(root, "ParticleAtomicNumber", 1);
 	is_lepton = (Anumber == 0);
-	lambda_par = childDoubleValue(root, "ParallelMfp", lambda_par);
-	MagField = childDoubleValue(root, "BfieldAtSun", MagField);
+	parallel_mfp = childDoubleValue(root, "ParallelMfp", parallel_mfp);
+	bfield_earth = childDoubleValue(root, "BfieldAtSun", bfield_earth);
 	delta_low = childDoubleValue(root, "Delta", delta_low);
 	delta_low = childDoubleValue(root, "DeltaLow", delta_low);
 	delta_hi = childDoubleValue(root, "Delta", delta_hi);
@@ -89,8 +89,8 @@ void Input::print() {
 		std::cout << "- type = lepton\n";
 	else
 		std::cout << "- type = nucleus\n";
-	std::cout << "- parallel mean free path = " << lambda_par << "\n";
-	std::cout << "- B field at Sun = " << MagField << "\n";
+	std::cout << "- parallel mean free path = " << parallel_mfp << "\n";
+	std::cout << "- B field at Sun = " << bfield_earth << "\n";
 	std::cout << "- delta = " << delta_low << " - " << delta_hi << "\n";
 	std::cout << "- ref rigidity = " << reference_rigidity << "\n";
 	std::cout << "- perpendicular diffusion = " << Kperp_factor << "\n";

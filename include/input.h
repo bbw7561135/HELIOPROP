@@ -26,11 +26,11 @@ public:
 	std::string output_filename;
 
 	double Kperp_factor;
-	double lambda_par;
+	double parallel_mfp;
 	double delta_low;
 	double delta_hi;
 	double reference_rigidity;
-	double MagField;
+	double bfield_earth;
 	double polarity;
 	double tiltangle;
 	double Rmax; // Rmax = Radius of the HelioPause [ UA ]
